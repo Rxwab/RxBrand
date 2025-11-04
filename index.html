@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RxStore | متجر الأزياء الفاخرة</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <style>
+        /* إعدادات الخط الأساسية والتصميم العام */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f7f7;
+            color: #1a1a1a;
+            direction: rtl;
+            text-align: right;
+            overflow-x: hidden;
+        }
+        /* تصميم الحاوية الكلاسيكية للوحة البيضاء */
+        .container-card {
+            background-color: white;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            border: 1px solid #f0f0f0;
+        }
+        /* تأثير التكبير النظيف على المنتج */
+        .product-card-image {
+            transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        .product-card:hover .product-card-image {
+            transform: scale(1.05);
+        }
+        /* زر الإجراء السريع (Quick Action Button) */
+        .quick-action {
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.3s, transform 0.3s;
+        }
+        .product-card:hover .quick-action {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* تنسيق الألوان والأحجام المختارة لصفحة المنتج */
+        .color-option.selected {
+            outline: 3px solid #000;
+            outline-offset: 2px;
+        }
+        .size-option.selected {
+            background-color: #1a1a1a;
+            color: white;
+            border-color: #1a1a1a;
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-8">
+
+    <div class="max-w-screen-xl mx-auto space-y-12">
+
+        <header class="container-card p-6 flex justify-between items-center">
+            <a href="#" class="text-3xl font-extrabold tracking-widest text-gray-900" onclick="showPage('homepage')">RxStore</a>
+            
+            <nav class="hidden md:flex space-x-8 space-x-reverse text-sm font-bold">
+                <a href="#" class="text-gray-900 hover:text-blue-600 transition" onclick="showPage('homepage')">الرئيسية</a>
+                <a href="#" class="text-gray-600 hover:text-gray-900 transition">ملابس</a>
+                <a href="#" class="text-gray-600 hover:text-gray-900 transition">إكسسوارات</a>
+            </nav>
+            
+            <div class="flex items-center space-x-4 space-x-reverse">
+                <svg class="w-6 h-6 text-gray-700 hover:text-black cursor-pointer" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                <svg class="w-6 h-6 text-gray-700 hover:text-black cursor-pointer" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                
+                <div class="relative cursor-pointer" onclick="alert('لم يتم بناء صفحة السلة بعد. المنتجات: ' + JSON.stringify(cartItems))">
+                    <svg class="w-6 h-6 text-gray-700 hover:text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                    <span id="cart-count" class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">0</span>
+                </div>
+                
+                <button class="md:hidden p-1">
+                     <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </div>
+        </header>
+
+        <main id="homepage" class="page-content space-y-12">
+            <section class="container-card p-8 bg-black text-white flex flex-col justify-center items-center text-center h-64 sm:h-96 relative overflow-hidden">
+                <img src="https://placehold.co/1200x600/1e293b/f8fafc?text=RxStore+Collections" 
+                     alt="صورة خلفية لمجموعة أزياء" 
+                     class="absolute inset-0 w-full h-full object-cover z-10 opacity-70">
+                
+                <div class="relative z-20 max-w-2xl">
+                    <h1 class="text-4xl sm:text-6xl font-extrabold mb-4 leading-tight">
+                        الجمال في <span class="text-yellow-400">التفاصيل</span>
+                    </h1>
+                    <p class="text-gray-300 text-lg sm:text-xl mb-6 hidden sm:block">
+                        اكتشف مجموعتنا الجديدة من التصاميم الكلاسيكية والمعاصرة.
+                    </p>
+                    <a href="#" class="bg-white text-black px-8 py-3 rounded-full font-bold text-lg hover:bg-gray-200 transition duration-300 shadow-xl">
+                        تسوق المجموعة الآن
+                    </a>
+                </div>
+            </section>
+            
+            <section>
+                <div class="flex justify-between items-center mb-6 border-b border-gray-200 pb-3">
+                    <h2 class="text-3xl font-extrabold text-gray-900">جديدنا هذا الأسبوع</h2>
+                    <a href="#" class="text-sm font-semibold text-gray-700 hover:text-black transition">عرض الكل <span aria-hidden="true">&rarr;</span></a>
+                </div>
+                
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                    
+                    <a href="#" class="product-card block group" onclick="showProduct('هودي Rxstore الأخضر', '450 ر.س')">
+                        <div class="product-card-container bg-white shadow-none p-0 overflow-hidden">
+                            <div class="aspect-[3/4] bg-gray-100 rounded-xl overflow-hidden mb-3 relative">
+                                <img src="https://placehold.co/300x400/94a3b8/1e293b?text=هودي+Rx" 
+                                    class="product-card-image w-full h-full object-cover" alt="هودي أخضر فاخر">
+                                
+                                <button class="quick-action absolute bottom-4 left-1/2 -translate-x-1/2 bg-black text-white px-5 py-2 text-sm rounded-full font-bold hover:bg-gray-800 focus:outline-none" onclick="showProduct(event, 'هودي Rxstore الأخضر', '450 ر.س');">
+                                    عرض سريع
+                                </button>
+                            </div>
+                            
+                            <div class="p-2 pt-0 text-center">
+                                <div class="flex justify-center items-center mt-2">
+                                    <p class="text-lg font-bold">450 ر.س</p>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    
+                    <a href="#" class="product-card block group" onclick="showProduct('تيشيرت قطن عضوي رمادي', '120 ر.س')">
+                         <div class="product-card-container bg-white shadow-none p-0 overflow-hidden">
+                             <div class="aspect-[3/4] bg-gray-100 rounded-xl overflow-hidden mb-3 relative">
+                                <img src="https://placehold.co/300x400/1c2732/ffffff?text=تيشيرت+عضوي" 
+                                    class="product-card-image w-full h-full object-cover" alt="تيشيرت قطن عضوي">
+                                <button class="quick-action absolute bottom-4 left-1/2 -translate-x-1/2 bg-black text-white px-5 py-2 text-sm rounded-full font-bold hover:bg-gray-800 focus:outline-none" onclick="showProduct(event, 'تيشيرت قطن عضوي رمادي', '120 ر.س');">
+                                    عرض سريع
+                                </button>
+                            </div>
+                            <div class="p-2 pt-0 text-center">
+                                 <div class="flex justify-center items-center mt-2">
+                                    <p class="text-lg font-bold">120 ر.س</p>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    
+                    <a href="#" class="product-card block group" onclick="showProduct('نظارة شمسية كلاسيكية معدنية', '399 ر.س')">
+                        <div class="product-card-container bg-white shadow-none p-0 overflow-hidden">
+                            <div class="aspect-[3/4] bg-gray-100 rounded-xl overflow-hidden mb-3 relative">
+                                <img src="https://placehold.co/300x400/fecaca/991b1b?text=نظارة+كلاسيك" 
+                                    class="product-card-image w-full h-full object-cover" alt="نظارة شمسية كلاسيكية">
+                                <button class="quick-action absolute bottom-4 left-1/2 -translate-x-1/2 bg-black text-white px-5 py-2 text-sm rounded-full font-bold hover:bg-gray-800 focus:outline-none" onclick="showProduct(event, 'نظارة شمسية كلاسيكية معدنية', '399 ر.س');">
+                                    عرض سريع
+                                </button>
+                            </div>
+                            <div class="p-2 pt-0 text-center">
+                                 <div class="flex justify-center items-center mt-2">
+                                    <p class="text-lg font-bold">399 ر.س</p>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    
+                    <a href="#" class="product-card block group" onclick="showProduct('جاكيت جلد إيطالي أصلي', '999 ر.س')">
+                         <div class="product-card-container bg-white shadow-none p-0 overflow-hidden">
+                            <div class="aspect-[3/4] bg-gray-100 rounded-xl overflow-hidden mb-3 relative">
+                                <img src="https://placehold.co/300x400/374151/d1d5db?text=جاكيت+جلد" 
+                                    class="product-card-image w-full h-full object-cover" alt="جاكيت جلد عتيق">
+                                <button class="quick-action absolute bottom-4 left-1/2 -translate-x-1/2 bg-black text-white px-5 py-2 text-sm rounded-full font-bold hover:bg-gray-800 focus:outline-none" onclick="showProduct(event, 'جاكيت جلد إيطالي أصلي', '999 ر.س');">
+                                    عرض سريع
+                                </button>
+                            </div>
+                            <div class="p-2 pt-0 text-center">
+                                 <div class="flex justify-center items-center mt-2">
+                                    <p class="text-lg font-bold">999 ر.س</p>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </section>
+            
+            <section class="container-card p-10 bg-black text-white flex flex-col md:flex-row items-center gap-8">
+                <div class="md:w-2/3">
+                    <h2 class="text-4xl font-extrabold mb-4 leading-snug">RxStore: فخامة تبدأ من هنا</h2>
+                    <p class="text-gray-300 text-lg mb-6">
+                        تصاميمنا الفاخرة تُصنع بحرفية فائقة، باستخدام مواد مستدامة عالية الجودة. كل قطعة هي وعد بأسلوب لا يزول.
+                    </p>
+                    <a href="#" class="text-sm font-bold underline hover:text-yellow-400 transition">
+                        اكتشف قصتنا
+                    </a>
+                </div>
+                <div class="md:w-1/3 aspect-square rounded-xl overflow-hidden shadow-2xl">
+                     <img src="https://placehold.co/400x400/000000/ffffff?text=Rx+Fashion" 
+                        alt="صورة تجريدية للعلامة التجارية" 
+                        class="w-full h-full object-cover opacity-80">
+                </div>
+            </section>
+
+        </main>
+        
+        <main id="product-page" class="page-content space-y-8 hidden">
+             <div class="text-sm text-gray-500 mb-4">
+                 <a href="#" onclick="showPage('homepage')" class="hover:text-black">الرئيسية</a> / <span id="product-category">ملابس</span> / <span id="product-title-breadcrumb">هودي Rxstore الأخضر</span>
+             </div>
+
+             <div class="container-card p-6 md:p-10 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+                <div class="space-y-4">
+                    <div class="aspect-square bg-gray-100 rounded-xl overflow-hidden">
+                        <img id="main-product-image" src="https://placehold.co/800x800/94a3b8/1e293b?text=هودي+Rx+الرئيسي" alt="الصورة الرئيسية للمنتج" class="w-full h-full object-cover">
+                    </div>
+                    <div class="flex space-x-3 space-x-reverse overflow-x-auto pb-2">
+                        <div class="w-20 h-20 sm:w-28 sm:h-28 rounded-xl bg-gray-100 overflow-hidden cursor-pointer border-2 border-transparent hover:border-black transition">
+                             <img src="https://placehold.co/300x300/e0e7ff/1e293b?text=تفصيل+1" class="w-full h-full object-cover" onclick="changeMainImage(this.src)">
+                        </div>
+                        <div class="w-20 h-20 sm:w-28 sm:h-28 rounded-xl bg-gray-100 overflow-hidden cursor-pointer border-2 border-transparent hover:border-black transition">
+                             <img src="https://placehold.co/300x300/a5f3fc/1e293b?text=تفصيل+2" class="w-full h-full object-cover" onclick="changeMainImage(this.src)">
+                        </div>
+                        <div class="w-20 h-20 sm:w-28 sm:h-28 rounded-xl bg-gray-100 overflow-hidden cursor-pointer border-2 border-transparent hover:border-black transition">
+                            <img src="https://placehold.co/300x300/fef3c7/1e293b?text=تفصيل+3" class="w-full h-full object-cover" onclick="changeMainImage(this.src)">
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h1 id="product-title" class="text-3xl sm:text-4xl font-extrabold mb-2">هودي Rxstore الأخضر</h1>
+                    <p id="product-price" class="text-4xl font-bold mb-6">450 ر.س</p>
+
+                    <div class="mb-6">
+                        <p class="font-bold mb-2 text-sm text-gray-700">اللون: <span id="selected-color-name" class="font-normal text-black">أخضر</span></p>
+                        <div class="flex space-x-3 space-x-reverse">
+                            <button class="color-option w-8 h-8 rounded-full bg-green-500 selected" data-color="أخضر" onclick="selectOption(this, 'color')"></button>
+                            <button class="color-option w-8 h-8 rounded-full bg-black" data-color="أسود" onclick="selectOption(this, 'color')"></button>
+                            <button class="color-option w-8 h-8 rounded-full bg-white border border-gray-300" data-color="أبيض" onclick="selectOption(this, 'color')"></button>
+                            <button class="color-option w-8 h-8 rounded-full bg-blue-700" data-color="أزرق داكن" onclick="selectOption(this, 'color')"></button>
+                        </div>
+                    </div>
+
+                    <div class="mb-8">
+                        <div class="flex justify-between items-center mb-2">
+                             <p class="font-bold text-sm text-gray-700">المقاس: <span id="selected-size-name" class="font-normal text-black">M</span></p>
+                             <a href="#" class="text-xs text-gray-500 hover:text-black underline">دليل المقاسات</a>
+                        </div>
+                        <div class="flex space-x-3 space-x-reverse">
+                            <button class="size-option px-4 py-2 border rounded-full text-sm font-medium" data-size="S" onclick="selectOption(this, 'size')">S</button>
+                            <button class="size-option px-4 py-2 border rounded-full text-sm font-medium selected" data-size="M" onclick="selectOption(this, 'size')">M</button>
+                            <button class="size-option px-4 py-2 border rounded-full text-sm font-medium" data-size="L" onclick="selectOption(this, 'size')">L</button>
+                            <button class="size-option px-4 py-2 border rounded-full text-sm font-medium" data-size="XL" onclick="selectOption(this, 'size')">XL</button>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-4 mb-8">
+                        <button class="flex-1 bg-black text-white p-4 rounded-xl font-bold text-lg hover:bg-gray-800 transition shadow-xl" onclick="addToCart()">
+                            أضف إلى السلة
+                        </button>
+                        <button class="flex-1 bg-gray-200 text-black p-4 rounded-xl font-bold text-lg hover:bg-gray-300 transition border border-gray-300">
+                            اشتر الآن
+                        </button>
+                    </div>
+                    
+                    <div class="bg-gray-50 p-6 rounded-xl border border-gray-200">
+                        <h3 class="font-bold text-lg mb-3 border-b pb-2">تفاصيل المنتج</h3>
+                        <p class="text-gray-700 text-sm leading-relaxed">
+                            هودي Rxstore الفاخر صُنع من مزيج قطني عضوي عالي الجودة، يمنحك الدفء والراحة الفائقة. تصميم واسع (Oversized) ليناسب أحدث صيحات الموضة. مثالي للإطلالات اليومية العصرية.
+                        </p>
+                        <ul class="list-disc pr-5 mt-3 text-sm text-gray-700 space-y-1">
+                            <li>الخامة: 80% قطن عضوي، 20% بوليستر معاد تدويره.</li>
+                            <li>التصميم: قصّة واسعة بجيوب كانجارو.</li>
+                            <li>تعليمات الغسيل: يغسل بالماء البارد.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-12">
+                 <h2 class="text-3xl font-extrabold text-gray-900 mb-6 border-b border-gray-200 pb-3">منتجات قد تعجبك</h2>
+                 <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                    <a href="#" class="product-card block group" onclick="showProduct('Soft Hoodie الكلاسيكي', '290 ر.س')">
+                         <div class="product-card-container bg-white shadow-none p-0 overflow-hidden">
+                            <div class="aspect-[3/4] bg-gray-100 rounded-xl overflow-hidden mb-3 relative">
+                                <img src="https://placehold.co/300x400/b8b8b8/1e293b?text=هودي+ناعم" class="product-card-image w-full h-full object-cover" alt="هودي ناعم">
+                                <button class="quick-action absolute bottom-4 left-1/2 -translate-x-1/2 bg-black text-white px-5 py-2 text-sm rounded-full font-bold hover:bg-gray-800 focus:outline-none" onclick="showProduct(event, 'Soft Hoodie الكلاسيكي', '290 ر.س');">عرض سريع</button>
+                            </div>
+                            <div class="p-2 pt-0 text-center">
+                                 <p class="text-lg font-bold mt-2">290 ر.س</p>
+                            </div>
+                        </div>
+                    </a>
+                     <a href="#" class="product-card block group" onclick="showProduct('Black to basic tee', '110 ر.س')">
+                         <div class="product-card-container bg-white shadow-none p-0 overflow-hidden">
+                            <div class="aspect-[3/4] bg-gray-100 rounded-xl overflow-hidden mb-3 relative">
+                                <img src="https://placehold.co/300x400/000000/ffffff?text=تيشيرت+أسود" class="product-card-image w-full h-full object-cover" alt="تيشيرت أسود أساسي">
+                                <button class="quick-action absolute bottom-4 left-1/2 -translate-x-1/2 bg-black text-white px-5 py-2 text-sm rounded-full font-bold hover:bg-gray-800 focus:outline-none" onclick="showProduct(event, 'Black to basic tee', '110 ر.س');">عرض سريع</button>
+                            </div>
+                             <div class="p-2 pt-0 text-center">
+                                 <p class="text-lg font-bold mt-2">110 ر.س</p>
+                            </div>
+                        </div>
+                    </a>
+                    <a href="#" class="product-card block group" onclick="showProduct('Urban Green Outer', '650 ر.س')">
+                         <div class="product-card-container bg-white shadow-none p-0 overflow-hidden">
+                            <div class="aspect-[3/4] bg-gray-100 rounded-xl overflow-hidden mb-3 relative">
+                                <img src="https://placehold.co/300x400/4c7c4c/ffffff?text=جاكيت+أخضر" class="product-card-image w-full h-full object-cover" alt="جاكيت أخضر">
+                                <button class="quick-action absolute bottom-4 left-1/2 -translate-x-1/2 bg-black text-white px-5 py-2 text-sm rounded-full font-bold hover:bg-gray-800 focus:outline-none" onclick="showProduct(event, 'Urban Green Outer', '650 ر.س');">عرض سريع</button>
+                            </div>
+                             <div class="p-2 pt-0 text-center">
+                                 <p class="text-lg font-bold mt-2">650 ر.س</p>
+                            </div>
+                        </div>
+                    </a>
+                     <a href="#" class="product-card block group" onclick="showProduct('جاكيت جلد إيطالي أصلي', '999 ر.س')">
+                         <div class="product-card-container bg-white shadow-none p-0 overflow-hidden">
+                            <div class="aspect-[3/4] bg-gray-100 rounded-xl overflow-hidden mb-3 relative">
+                                <img src="https://placehold.co/300x400/374151/d1d5db?text=جاكيت+جلد" class="product-card-image w-full h-full object-cover" alt="جاكيت جلد عتيق">
+                                <button class="quick-action absolute bottom-4 left-1/2 -translate-x-1/2 bg-black text-white px-5 py-2 text-sm rounded-full font-bold hover:bg-gray-800 focus:outline-none" onclick="showProduct(event, 'جاكيت جلد إيطالي أصلي', '999 ر.س');">عرض سريع</button>
+                            </div>
+                            <div class="p-2 pt-0 text-center">
+                                 <p class="text-lg font-bold mt-2">999 ر.س</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+        </main>
+
+        <footer class="text-sm text-gray-600 border-t border-gray-200 pt-8 mt-8">
+            <div class="grid md:grid-cols-4 gap-8 pb-8">
+                <div>
+                    <h4 class="text-lg font-bold text-gray-900 mb-4">RxStore</h4>
+                    <p>متجركم الموثوق للأزياء العصرية والفاخرة.</p>
+                </div>
+                <div>
+                    <h4 class="font-bold text-gray-900 mb-4">الدعم والمساعدة</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="hover:text-black">سياسة الإرجاع</a></li>
+                        <li><a href="#" class="hover:text-black">اتصل بنا</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold text-gray-900 mb-4">الشركة</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="hover:text-black">من نحن</a></li>
+                        <li><a href="#" class="hover:text-black">المدونة</a></li>
+                    </ul>
+                </div>
+                 <div>
+                    <h4 class="font-bold text-gray-900 mb-4">تابعنا</h4>
+                    <div class="flex space-x-4 space-x-reverse text-gray-700">
+                        <a href="#"><svg class="w-6 h-6 hover:text-black" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.768s.784-1.768 1.75-1.768 1.75.79 1.75 1.768-.783 1.768-1.75 1.768zm13.5 12.268h-3v-5.604c0-3.368-4-3.529-4 0v5.604h-3v-11h3v1.765c1.398-2.586 7-2.715 7 2.376v6.859z"></path></svg></a>
+                        <a href="#"><svg class="w-6 h-6 hover:text-black" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M22.46 6c-.77.35-1.6.58-2.46.69.88-.53 1.55-1.37 1.87-2.37-.83.49-1.75.84-2.72 1.03-.79-.84-1.92-1.37-3.17-1.37-2.39 0-4.34 1.95-4.34 4.34 0 .34.04.67.11.99-3.6-.18-6.8-1.9-8.94-4.52-.37.63-.58 1.36-.58 2.14 0 1.5.76 2.82 1.9 3.6-.7-.02-1.35-.22-1.92-.53v.05c0 2.11 1.5 3.88 3.5 4.29-.37.1-.76.15-1.16.15-.28 0-.54-.03-.79-.08.56 1.74 2.17 3 4.08 3.04-1.5.94-3.38 1.5-5.42 1.5-.35 0-.69-.02-1.02-.06 1.95 1.25 4.27 2 6.77 2 8.12 0 12.55-6.73 12.55-12.55 0-.2-.01-.4-.01-.6.87-.63 1.63-1.42 2.23-2.32z"></path></svg></a>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center py-4 border-t border-gray-100">
+                &copy; 2025 RxStore. جميع الحقوق محفوظة.
+            </div>
+        </footer>
+
+    </div>
+
+    <script>
+        // متغير عالمي لتخزين معلومات المنتج الحالي المختار
+        let currentProduct = {
+            title: 'هودي Rxstore الأخضر',
+            price: '450 ر.س',
+            color: 'أخضر',
+            size: 'M'
+        };
+
+        // مصفوفة افتراضية للسلة
+        let cartItems = [];
+
+        // دالة لعرض صفحة وإخفاء الأخرى
+        function showPage(pageId) {
+            document.getElementById('homepage').classList.add('hidden');
+            document.getElementById('product-page').classList.add('hidden');
+            document.getElementById(pageId).classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // دالة لعرض صفحة المنتج وتحديث محتوياتها
+        function showProduct(event, title, price) {
+            // منع الانتقال للصفحة إذا كان مصدر النقر هو زر "عرض سريع"
+            if (event && event.target.classList.contains('quick-action')) {
+                event.preventDefault();
+            }
+
+            // تحديث معلومات المنتج الحالي
+            currentProduct.title = title;
+            currentProduct.price = price;
+            
+            // تحديث محتوى صفحة المنتج
+            document.getElementById('product-title').textContent = title;
+            document.getElementById('product-title-breadcrumb').textContent = title;
+            document.getElementById('product-price').textContent = price;
+            
+            // إعادة تعيين الخيارات المحددة إلى القيم الافتراضية
+            resetOptions();
+            
+            // عرض صفحة المنتج
+            showPage('product-page');
+        }
+
+        // دالة لإعادة تعيين خيارات اللون والمقاس
+        function resetOptions() {
+            // إعادة تعيين الألوان (اختيار أول لون كافتراضي)
+            document.querySelectorAll('.color-option').forEach((btn, index) => {
+                btn.classList.remove('selected');
+                if (index === 0) {
+                    btn.classList.add('selected');
+                    document.getElementById('selected-color-name').textContent = btn.dataset.color;
+                    currentProduct.color = btn.dataset.color; // تحديث المنتج الحالي
+                }
+            });
+
+            // إعادة تعيين المقاسات (اختيار المقاس M كافتراضي)
+            document.querySelectorAll('.size-option').forEach(btn => {
+                btn.classList.remove('selected');
+                if (btn.dataset.size === 'M') {
+                    btn.classList.add('selected');
+                    document.getElementById('selected-size-name').textContent = btn.dataset.size;
+                    currentProduct.size = btn.dataset.size; // تحديث المنتج الحالي
+                }
+            });
+
+            // تعيين الصورة الرئيسية الافتراضية
+            document.getElementById('main-product-image').src = "https://placehold.co/800x800/94a3b8/1e293b?text=هودي+Rx+الرئيسي";
+        }
+
+        // دالة لتحديد اللون أو المقاس
+        function selectOption(element, type) {
+            const className = type === 'color' ? 'color-option' : 'size-option';
+            const dataAttribute = type === 'color' ? 'color' : 'size';
+            const nameElementId = type === 'color' ? 'selected-color-name' : 'selected-size-name';
+            
+            // إزالة التحديد من جميع الأزرار لنفس النوع
+            document.querySelectorAll(`.${className}`).forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            
+            // إضافة التحديد للزر الحالي
+            element.classList.add('selected');
+
+            // تحديث اسم الخيار المحدد وتحديث المنتج الحالي
+            document.getElementById(nameElementId).textContent = element.dataset[dataAttribute];
+            if (type === 'color') {
+                currentProduct.color = element.dataset.color;
+            } else {
+                currentProduct.size = element.dataset.size;
+            }
+        }
+
+        // دالة لتغيير الصورة الرئيسية
+        function changeMainImage(src) {
+            document.getElementById('main-product-image').src = src;
+        }
+
+        // دالة الإضافة إلى السلة (الجديدة)
+        function addToCart() {
+            const productToAdd = {
+                title: currentProduct.title,
+                price: currentProduct.price,
+                color: currentProduct.color,
+                size: currentProduct.size,
+                quantity: 1 // يمكن إضافة منطق لزيادة الكمية لاحقاً
+            };
+
+            cartItems.push(productToAdd);
+            updateCartCount();
+            
+            // عرض تنبيه للمستخدم
+            alert(`تمت إضافة "${productToAdd.title} - لون: ${productToAdd.color} - مقاس: ${productToAdd.size}" إلى السلة بنجاح!`);
+        }
+
+        // دالة تحديث عدد المنتجات في السلة (الجديدة)
+        function updateCartCount() {
+            document.getElementById('cart-count').textContent = cartItems.length;
+        }
+
+        // التأكد من عرض الصفحة الرئيسية عند التحميل وتحديث عداد السلة
+        document.addEventListener('DOMContentLoaded', () => {
+            showPage('homepage');
+            updateCartCount();
+        });
+    </script>
+
+</body>
+</html>
